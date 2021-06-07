@@ -1,3 +1,2 @@
 alembic revision --autogenerate -m "test"
 alembic upgrade head
-alembic stamp head

@@ -1,25 +1,29 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, File, UploadFile
 from Model import *
 
 app = FastAPI()
 
 
-@app.post('/places/', response_model=Place)
-async def create_places_view(place: Place, db: Session = Depends(get_db)):
-    db_place = create_place(db, place)
-    return db_place
+@app.post('/user/')  # , response_model=User
+async def create_user_view(user: User, db: Session = Depends(get_db)):
+    db_user = create_user(db, user)
+    return db_user
 
 
-@app.get('/places/', response_model=List[Place])
-def get_places_view(db: Session = Depends(get_db)):
-    return get_places(db)
+@app.get('/user/', response_model=List[User])
+def get_user_view(db: Session = Depends(get_db)):
+    return get_users(db)
 
 
-@app.get('/place/{place_id}')
-def get_place_view(place_id: int, db: Session = Depends(get_db)):
-    return get_place(db, place_id)
+@app.post('/file/')
+async def file_upload(file: UploadFile = File(...)):
+    print(file)
+
+# @app.get('/user/{user_uuid}')
+# def get_place_view(place_id: int, db: Session = Depends(get_db)):
+#     return get_place(db, place_id)
 
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Hello?"}

@@ -22,7 +22,6 @@ class DBUser(Base):
     isPublicHealth = Column(Boolean)
     create = Column(TIMESTAMP)
 
-
 Base.metadata.create_all(bind=engine)
 
 

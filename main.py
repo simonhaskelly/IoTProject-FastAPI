@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, File, UploadFile
+from fastapi import FastAPI, Form, Depends, File, UploadFile
 from Model import *
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -15,21 +15,13 @@ app.add_middleware(
 
 
 # Routes
-@app.post('/user/')  # , response_model=User
-async def create_user_view(user: User, db: Session = Depends(get_db)):
-    db_user = create_user(db, user)
-    return db_user
+@app.post('/api/')  # , response_model=User
+async def add_row(db: Session = Depends(get_db), raw: RawBase = Depends(RawBase.as_form)):
+    db_user = add_raw(db, raw)
+    return raw.dict()
 
 
-@app.get('/user/')  # , response_model=List[User]
-def get_user_view(db: Session = Depends(get_db)):
-    return get_users(db)
+# @app.get('/api/')  # , response_model=List[User]
+# def get_user_view(db: Session = Depends(get_db)):
+#     return get_users(db)
 
-
-@app.post('/file/')
-async def file_upload(file: UploadFile = File(...)):
-    print(file)
-
-@app.get("/")
-async def root():
-    return {"message": "Hello?"}

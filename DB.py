@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
-from sqlalchemy import Boolean, Column, Float, String, Integer, Text, TIMESTAMP
+from sqlalchemy import Boolean, Column, Float, String, Integer, Text, TIMESTAMP, ForeignKey
+from sqlalchemy.orm import relationship
 
 # SqlAlchemy init
 SQLALCHEMY_DATABASE_URL = 'postgresql://postgres:h2me053556389DE@localhost:5432/mfucare'

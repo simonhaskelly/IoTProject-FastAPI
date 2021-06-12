@@ -15,13 +15,14 @@ app.add_middleware(
 
 
 # Routes
+# just in case that we cant build JSON (Arduino shit) - multi-part data is accepted here
 @app.post('/api/')  # , response_model=User
-async def add_row(db: Session = Depends(get_db), raw: RawBase = Depends(RawBase.as_form)):
+async def add_raw(db: Session = Depends(get_db), raw: RawBase = Depends(RawBase.as_form)):
     db_user = add_raw(db, raw)
-    return raw.dict()
+    return db_user
 
 
-# @app.get('/api/')  # , response_model=List[User]
-# def get_user_view(db: Session = Depends(get_db)):
-#     return get_users(db)
-
+@app.get('/api/')
+async def get_data(db: Session = Depends(get_db), when: PlotDataIn = Depends(PlotDataIn)):
+    if when.when is not None:
+        return get_data_today(db)

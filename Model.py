@@ -2,15 +2,14 @@ import inspect
 from pydantic import BaseModel, validator
 from typing import Optional, List, Type, NewType
 from DB import *
-from datetime import datetime
+from datetime import datetime,date
 from fastapi import Form
-from sqlalchemy.dialects.postgresql import UUID
-import uuid
-from Password import get_password_hash
+from sqlalchemy import func
 
 StringId = NewType('StringId', str)
 
 
+# "Pydantic" way to handle non JSON data (multi-part data)
 def as_form(cls: Type[BaseModel]):
     new_params = [
         inspect.Parameter(
@@ -39,8 +38,7 @@ class Raw(Base):
     room_id = Column(Integer, ForeignKey('room.id'), nullable=False)
     time = Column(TIMESTAMP, index=True)
 
-    # room = relationship("DBRoom", foreign_keys=[room_id])
-    room = relationship("Room", back_populates="name")
+    room = relationship("Room", back_populates="data")  # Sqlalchemy magic /* Pew Pew
 
 
 class Room(Base):
@@ -48,7 +46,8 @@ class Room(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     name = Column(String(30), nullable=False)
 
-    data = relationship("Raw", back_populates="id")
+    data = relationship("Raw", back_populates="room")  # Sqlalchemy magic /* Pew Pew
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -58,7 +57,7 @@ class RawBase(BaseModel):
     v: float
     i: float
     room_id: int
-    #time: Optional[str] = datetime.now()
+    time: Optional[datetime] = None
 
     class Config:
         orm_mode = True
@@ -71,23 +70,28 @@ class RoomBase(BaseModel):
         orm_mode = True
 
 
+class PlotDataIn(BaseModel):
+    when: Optional[datetime] = None
+
+
+class PlotDataOut(BaseModel):
+    v: float
+    i: float
+    time: datetime
+    date: datetime
+
+
 def add_raw(db: Session, raw: RawBase):
-    db_raw = Raw(**raw.dict())
+    db_raw = Raw(v=raw.v, i=raw.i, room_id=raw.room_id, time=datetime.now())
     db.add(db_raw)
     db.commit()
     db.refresh(db_raw)
-    return db_raw
-# def get_users(db: Session):
-#     return db.query(DBUser).all()
-#
-#
-# def create_user(db: Session, user: User):
-#     hashed_password = get_password_hash(user.password1)
-#     db_user = DBUser(username=user.username, password=hashed_password, lineID=user.lineID,
-#                      isAdmin=user.isAdmin, isVolunteer=user.isVolunteer, isPublicHealth=user.isPublicHealth,
-#                      create=datetime.now())
-#     db.add(db_user)
-#     db.commit()
-#     db.refresh(db_user)
-#     return db_user
+    return db_raw  # db_raw.room return relational 'Room' {id} and {name}
 
+
+def get_data_today(db: Session):
+    return db.query(Raw).filter(func.DATE(Raw.datetime) == date.today).all()
+
+
+def get_data_when(db: Session, when: PlotDataIn):
+    return db.query(Raw).filter(func.DATE(Raw.time) == date.today)

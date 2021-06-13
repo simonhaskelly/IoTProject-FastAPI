@@ -2,7 +2,7 @@ import inspect
 from pydantic import BaseModel, validator
 from typing import Optional, List, Type, NewType
 from DB import *
-from datetime import datetime
+from datetime import datetime,date
 from fastapi import Form
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
@@ -71,23 +71,21 @@ class RoomBase(BaseModel):
         orm_mode = True
 
 
+class When(BaseModel):
+    when: datetime
+
+
 def add_raw(db: Session, raw: RawBase):
     db_raw = Raw(v=raw.v, i=raw.i, room_id=raw.room_id, time=datetime.now())
     db.add(db_raw)
     db.commit()
     db.refresh(db_raw)
     return db_raw
-# def get_users(db: Session):
-#     return db.query(DBUser).all()
-#
-#
-# def create_user(db: Session, user: User):
-#     hashed_password = get_password_hash(user.password1)
-#     db_user = DBUser(username=user.username, password=hashed_password, lineID=user.lineID,
-#                      isAdmin=user.isAdmin, isVolunteer=user.isVolunteer, isPublicHealth=user.isPublicHealth,
-#                      create=datetime.now())
-#     db.add(db_user)
-#     db.commit()
-#     db.refresh(db_user)
-#     return db_user
 
+
+def get_data_today(db: Session):
+    return db.query(Raw).filter(func.DATE(Raw.time) == date.today()).all()
+
+
+def get_data_when(db: Session, when: When):
+    return db.query(Raw).filter(func.DATE(Raw.time) == when).all()

@@ -15,7 +15,6 @@ app.add_middleware(
 
 
 # Routes
-# lallaalalal
 @app.post('/api/')  # , response_model=User
 async def add_row(db: Session = Depends(get_db), raw: RawBase = Depends(RawBase.as_form)):
     ret = add_raw(db, raw)
@@ -23,7 +22,13 @@ async def add_row(db: Session = Depends(get_db), raw: RawBase = Depends(RawBase.
 
 
 @app.get('/api/')  # , response_model=List[User]
-async def get_user_view(db: Session = Depends(get_db)):
-    ret = get_data_today(db)
+async def get_test_view(db: Session = Depends(get_db)):
+    ret = get_test(db)
+    return ret
+
+
+@app.get('/api/chart')  # , response_model=List[User]
+async def get_test_chart(db: Session = Depends(get_db)):
+    ret = get_chart_test(db)
     return ret
 

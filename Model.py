@@ -83,6 +83,14 @@ def add_raw(db: Session, raw: RawBase):
     return db_raw
 
 
+def get_test(db: Session):
+    return db.query(Raw).order_by(-Raw.id).first()
+
+
+def get_chart_test(db: Session):
+    return db.query(Raw).all()
+
+
 def get_data_today(db: Session):
     return db.query(Raw).filter(func.DATE(Raw.time) == date.today()).all()
 

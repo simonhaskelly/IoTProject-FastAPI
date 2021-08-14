@@ -34,8 +34,12 @@ def as_form(cls: Type[BaseModel]):
 class Raw(Base):
     __tablename__ = 'iot'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    v = Column(Float, nullable=False)
-    i = Column(Float, nullable=False)
+    v1 = Column(Float, nullable=False)
+    i1 = Column(Float, nullable=False)
+    v2 = Column(Float, nullable=False)
+    i2 = Column(Float, nullable=False)
+    v3 = Column(Float, nullable=False)
+    i3 = Column(Float, nullable=False)
     room_id = Column(Integer, ForeignKey('room.id'), nullable=False)
     time = Column(TIMESTAMP, index=True)
 
@@ -55,9 +59,13 @@ Base.metadata.create_all(bind=engine)
 
 @as_form
 class RawBase(BaseModel):
-    v: float
-    i: float
-    room_id: int
+    v1: float
+    i1: float
+    v2: float
+    i2: float
+    v3: float
+    i3: float
+    # room_id: int
     #time: Optional[str] = datetime.now()
 
     class Config:
@@ -76,14 +84,15 @@ class When(BaseModel):
 
 
 def add_raw(db: Session, raw: RawBase):
-    db_raw = Raw(v=raw.v, i=raw.i, room_id=raw.room_id, time=datetime.now())
+    db_raw = Raw(v1=raw.v1, i1=raw.i1, v2=raw.v2, i2=raw.i2, v3=raw.v3, i3=raw.i3,
+                 room_id=1, time=datetime.now())
     db.add(db_raw)
     db.commit()
     db.refresh(db_raw)
     return db_raw
 
 
-def get_test(db: Session):
+def get_last(db: Session):
     return db.query(Raw).order_by(-Raw.id).first()
 
 

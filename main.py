@@ -22,8 +22,8 @@ async def add_row(db: Session = Depends(get_db), raw: RawBase = Depends(RawBase.
 
 
 @app.get('/api/')  # , response_model=List[User]
-async def get_test_view(db: Session = Depends(get_db)):
-    ret = get_test(db)
+async def get_last_view(db: Session = Depends(get_db)):
+    ret = get_last(db)
     return ret
 
 
